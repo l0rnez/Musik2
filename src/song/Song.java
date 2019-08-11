@@ -3,6 +3,7 @@ package song;
 import java.io.File;
 import java.io.IOException;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -17,6 +18,7 @@ public class Song {
 	File file;
 	AudioInputStream stream;
 	Clip clip;
+	AudioFormat format;
 
 	public Song(String title, String interpreter, String genre) {
 		this.title = title;
@@ -25,6 +27,7 @@ public class Song {
 		file = new File("./soundsource/" + title + "-" + interpreter + "-" + genre + ".wav");
 		try {
 			stream = AudioSystem.getAudioInputStream(file);
+			format = stream.getFormat();
 		} catch (UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -83,5 +86,11 @@ public class Song {
 		    } catch (Exception ex) {
 		      System.out.println(ex.getMessage());
 		    }
+	}
+	
+	public double getSongLength() {
+		long frames = stream.getFrameLength();
+		double durationInSeconds = (frames+0.0) / format.getFrameRate();  
+		return durationInSeconds;
 	}
 }
