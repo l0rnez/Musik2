@@ -1,7 +1,8 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,15 +16,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
+import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -35,24 +38,43 @@ public class MainFrame extends JFrame implements ActionListener {
 
 	private JList<String> list;
 	boolean clicked = false;
-    public MainFrame() {
-    	setTitle("Musikverwaltung");
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		getContentPane().setBackground(Color.getHSBColor((float) 0.55, (float) 0.7, (float) 0.8));
-        setLayout(null);
-        setVisible(true);
-        setSize(600, 320);
+	boolean songPlayed = false;
+	private JToggleButton pause;
 
-        DefaultListModel<String> listModel = new DefaultListModel<>();
+    public MainFrame() {
+    	setSize(600,320);
+    	setLayout(null);
+        setVisible(true);
+    	DefaultListModel<String> listModel = new DefaultListModel<>();
         DefaultListModel<String> listModel2 = new DefaultListModel<>();
-        for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
-        	listModel.addElement(Musikverwaltung.allSongs.get(i).getTitle());
-        }
-        list = new JList<>(listModel);
-        add(list);
-        list.setSize(200,200);
+    	JPanel panel = new JPanel(new BorderLayout());
+    	list = new JList<>(listModel);
+    	JScrollPane scrollPane = new JScrollPane();
+    	scrollPane.setViewportView(list);
+    	list.setLayoutOrientation(JList.VERTICAL);
+    	panel.setVisible(true);
+    	scrollPane.setVisible(true);
+    	panel.add(scrollPane);
+    	list.setSize(200,260);
         list.setVisible(true);
+        add(list);
+        add(panel);
+    	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setBackground(Color.getHSBColor((float) 0.55, (float) 0.7, (float) 0.8));
+        this.setTitle("Musikverwaltung");
+        this.setLocationRelativeTo(null);
+        pause = new JToggleButton();
+        pause.setBounds(185,135,90,90);
+        add(pause);
+        pause.setOpaque(false);
+		pause.setContentAreaFilled(false);
+		pause.setBorderPainted(false);
+		ImageIcon playII = new ImageIcon("play.png");
+		ImageIcon pauseII = new ImageIcon("pause.png");
+		pause.setIcon(playII);
+        for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
+        	listModel.addElement(Musikverwaltung.allSongs.get(i).getInterpreter() + "-" + Musikverwaltung.allSongs.get(i).getTitle());
+        }
         list.addListSelectionListener(new ListSelectionListener() {
 			
 			@Override
@@ -63,86 +85,35 @@ public class MainFrame extends JFrame implements ActionListener {
 					}
 				}
 				Musikverwaltung.allSongs.get(list.getSelectedIndex()).playSound("play");
+				songPlayed = true;
+				pause.setIcon(pauseII);
 			}
 		});
-//        list.setCellRenderer(new DefaultListCellRenderer() {
-//
-//            @Override
-//            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-//            	setText(((Component) value).getName());
-//            	if (isSelected)
-//
-//                {
-//                   setBackground(list.getSelectionBackground());
-//                   setForeground(list.getSelectionForeground());
-//                }
-//            	else
-//                {
-//                   setBackground(list.getBackground());
-//                   setForeground(list.getForeground());
-//                }
-//            	return this;
-//            }
-//        });
         
-        //Font
-		Font f1 = new Font(Font.SERIF, Font.PLAIN, 15);
-
+        Font f1 = new Font(Font.SERIF, Font.PLAIN, 15);
         
         //pause
-        JButton pause =new JButton("Pause/Play");
-        pause.setBounds(0,205,200,30);
-        pause.setFont(f1);
-        add(pause);
-
         pause.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!clicked) {
-					Musikverwaltung.allSongs.get(list.getSelectedIndex()).playSound("pause");
-					clicked = true;
-				}
-				else {
-					Musikverwaltung.allSongs.get(list.getSelectedIndex()).playSound("play");
-					clicked = false;
-				}
-			}
-		});
-        
-        //playAll
-        JButton playAll =new JButton("Play All");
-        playAll.setBounds(0,240,200,30);
-        playAll.setFont(f1);
-        add(playAll);
-        
-        playAll.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ArrayList<Song> songsToPlay = new ArrayList<>();
-				for(int i = 0; i<list.getModel().getSize(); i++) {
-					String songname = list.getModel().getElementAt(i).toString();
-					for(int j = 0; j<Musikverwaltung.allSongs.size(); j++) {
-						if(Musikverwaltung.allSongs.get(i).equals(songname)) {
-							songsToPlay.add(Musikverwaltung.allSongs.get(i));
-						}
+				if(songPlayed) {
+					if(!clicked) {
+						Musikverwaltung.allSongs.get(list.getSelectedIndex()).playSound("pause");
+						clicked = true;
+						pause.setIcon(playII);
 					}
-				}
-				for(int k = 0; k<songsToPlay.size(); k++) {
-					System.out.println(songsToPlay.get(k).getTitle());
-					songsToPlay.get(k).playSound("play");
-					try {
-						Thread.sleep((long) (songsToPlay.get(k).getSongLength()*1000));
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
+					else {
+						Musikverwaltung.allSongs.get(list.getSelectedIndex()).playSound("play");
+						clicked = false;
+						pause.setIcon(pauseII);
 					}
 				}
 			}
 		});
         
         //searchbar
-        JTextField search = new JTextField("");
+        JTextField search = new JTextField();
         add(search);
         search.setFont(f1);
         search.setBounds(200,10,150,30);
@@ -163,14 +134,14 @@ public class MainFrame extends JFrame implements ActionListener {
 					ArrayList<Song> results = searchSong(text);
 					listModel.removeAllElements();
 					for(int i = 0; i<results.size(); i++) {
-						listModel.addElement(results.get(i).getTitle());
+						listModel.addElement(results.get(i).getInterpreter() + "-" + results.get(i).getTitle());
 					}
 					list.setModel(listModel);
 				}
 				else {
 					listModel.removeAllElements();
 					for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
-						listModel.addElement(Musikverwaltung.allSongs.get(i).getTitle());
+						listModel.addElement(Musikverwaltung.allSongs.get(i).getInterpreter() + "-" + Musikverwaltung.allSongs.get(i).getTitle());
 					}
 					list.setModel(listModel);
 				}
@@ -185,10 +156,10 @@ public class MainFrame extends JFrame implements ActionListener {
         add(interpreters);
         add(genres);
         
-        //all playlists
+        //playlists
         playlists.setVisible(true);
         playlists.setBounds(200,50,150,30);
-        playlists.setEditable(true);
+        playlists.setEditable(false);
         playlists.addItem("Playlists");
         for(int k = 0; k<Musikverwaltung.allPlaylists.size(); k++) {
         	playlists.addItem(Musikverwaltung.allPlaylists.get(k).getName());
@@ -213,7 +184,11 @@ public class MainFrame extends JFrame implements ActionListener {
 								        sb.append(System.lineSeparator());
 								        String[] partsLine = line.split("-");
 										String partLine1 = partsLine[0];
-										listModel2.addElement(partLine1);
+										String partLine2 = partsLine[1];
+										listModel2.addElement(partLine2 + "-" + partLine1);
+										//
+										//
+										//
 										list.setModel(listModel2);
 								        line = br.readLine();
 								    }
@@ -225,18 +200,18 @@ public class MainFrame extends JFrame implements ActionListener {
 
 					}
 				}
-				if(playlists.getSelectedItem().toString().equals("Playlists")) {
+				if(playlists.getSelectedItem().toString().equals("all songs")) {
 					list.setModel(listModel);
 				}
-				interpreters.setSelectedItem("All Interpreters");
-				genres.setSelectedItem("All Genres");
+				interpreters.setSelectedItem("all interpreters");
+				genres.setSelectedItem("all genres");
 			}
 		});
         
         //sort interpreter
         interpreters.setBounds(200,85,150,30);
-        interpreters.setEditable(true);
-        interpreters.addItem("All Interpreters");
+        interpreters.setEditable(false);
+        interpreters.addItem("Interpreters");
         String interpreter = Musikverwaltung.allSongs.get(0).getInterpreter();
         for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
 			if(!Musikverwaltung.allSongs.get(i).getInterpreter().equals(interpreter)) {
@@ -251,22 +226,22 @@ public class MainFrame extends JFrame implements ActionListener {
 				listModel2.removeAllElements();
 				for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
 					if(interpreters.getSelectedItem().equals(Musikverwaltung.allSongs.get(i).getInterpreter())) {
-						listModel2.addElement(Musikverwaltung.allSongs.get(i).getTitle());
+						listModel2.addElement(Musikverwaltung.allSongs.get(i).getInterpreter() + "-" + Musikverwaltung.allSongs.get(i).getTitle());
 						list.setModel(listModel2);
 					}
 				}
-				if(interpreters.getSelectedItem().toString().equals("All Interpreters")) {
+				if(interpreters.getSelectedItem().toString().equals("all interpreters")) {
 					list.setModel(listModel);
 				}
-				playlists.setSelectedItem("Playlists");
-				genres.setSelectedItem("All Genres");
+				playlists.setSelectedItem("all songs");
+				genres.setSelectedItem("all genres");
 			}
 		});
         
         //sort genre
         genres.setBounds(200,120,150,30);
-        genres.setEditable(true);
-        genres.addItem("All Genres");
+        genres.setEditable(false);
+        genres.addItem("Genres");
         String genre = Musikverwaltung.allSongs.get(0).getGenre();
         for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
 			if(!Musikverwaltung.allSongs.get(i).getGenre().equals(genre)) {
@@ -281,21 +256,21 @@ public class MainFrame extends JFrame implements ActionListener {
 				listModel2.removeAllElements();
 				for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
 					if(genres.getSelectedItem().equals(Musikverwaltung.allSongs.get(i).getGenre())) {
-						listModel2.addElement(Musikverwaltung.allSongs.get(i).getTitle());
+						listModel2.addElement(Musikverwaltung.allSongs.get(i).getInterpreter() + "-" + Musikverwaltung.allSongs.get(i).getTitle());
 						list.setModel(listModel2);
 					}
 				}
-				if(genres.getSelectedItem().toString().equals("All Genres")) {
+				if(genres.getSelectedItem().toString().equals("all genres")) {
 					list.setModel(listModel);
 				}
-				playlists.setSelectedItem("Playlists");
-				interpreters.setSelectedItem("All Interpreters");
+				playlists.setSelectedItem("all songs");
+				interpreters.setSelectedItem("all interpreters");
 			}
 		});
         
         //add playlist button
         JButton addPlaylist =new JButton("Add");
-        final JFrame popup = new JFrame();
+        JFrame popup = new JFrame();
         JList popList = new JList<>(listModel);
         add(addPlaylist);
         popup.pack();
@@ -331,6 +306,7 @@ public class MainFrame extends JFrame implements ActionListener {
 				}
 			}
 		});
+
     }
 
 	@Override

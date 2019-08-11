@@ -18,11 +18,6 @@ public class Musikverwaltung{
 		//read songs
 		File folder = new File("./soundsource/");
 		File[] listOfFiles = folder.listFiles();
-		for (File file : listOfFiles) {
-		    if (file.isFile()) {
-//		        System.out.println(file.getName());
-		    }
-		}
 		for(int i = 0; i< listOfFiles.length; i++) {
 			String string = listOfFiles[i].getName();
 			String[] parts = string.split("-");
@@ -31,7 +26,6 @@ public class Musikverwaltung{
 			String part3 = parts[2];
 			String[] parts2 = part3.split("\\.");
 			part3 = parts2[0];
-//			System.out.println(part1 + "\n" + part2 + "\n" + part3);
 			Song song = new Song(part1, part2, part3);
 			allSongs.add(song);
 		}
@@ -61,7 +55,6 @@ public class Musikverwaltung{
 				        		playlist.addSong(allSongs.get(u));
 				        	}
 				        }
-//				        System.out.println("Playlist: " + playlist.getName() + "\n" + playlist.getContent());
 				        line = br.readLine();
 				    }
 				    String everything = sb.toString();
@@ -73,30 +66,5 @@ public class Musikverwaltung{
 		
 		//gui
 		MainFrame frame = new MainFrame();
-		//playlist memory
-		/*BufferedReader br = new BufferedReader(new FileReader("memory.txt"));
-		File f = new File("./memory.txt");
-		if(f.exists() && !f.isDirectory()) {
-			try {
-			    StringBuilder sb = new StringBuilder();
-			    String line = br.readLine();
-			    while (line != null) {
-			        sb.append(line);
-			        sb.append(System.lineSeparator());
-			        line = br.readLine();
-			    }
-			    String everything = sb.toString();
-			    System.out.println(everything);
-			} finally {
-			    br.close();
-			}
-		}
-		else {
-			f.getParentFile().mkdirs(); 
-			f.createNewFile();
-//			for(i = 0; i<playlist.) {
-//				
-//			}
-		}*/
 	}
 }
