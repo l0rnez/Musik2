@@ -200,11 +200,11 @@ public class MainFrame extends JFrame implements ActionListener {
 
 					}
 				}
-				if(playlists.getSelectedItem().toString().equals("all songs")) {
+				if(playlists.getSelectedItem().toString().equals("Playlists")) {
 					list.setModel(listModel);
 				}
-				interpreters.setSelectedItem("all interpreters");
-				genres.setSelectedItem("all genres");
+				interpreters.setSelectedItem("Interpreters");
+				genres.setSelectedItem("Genres");
 			}
 		});
         
@@ -212,13 +212,20 @@ public class MainFrame extends JFrame implements ActionListener {
         interpreters.setBounds(200,85,150,30);
         interpreters.setEditable(false);
         interpreters.addItem("Interpreters");
-        String interpreter = Musikverwaltung.allSongs.get(0).getInterpreter();
+        String interpreter = null;
+        ArrayList<String> interpreterList = new ArrayList<>();
         for(int i = 0; i<Musikverwaltung.allSongs.size(); i++) {
 			if(!Musikverwaltung.allSongs.get(i).getInterpreter().equals(interpreter)) {
-				interpreters.addItem(interpreter);
+				interpreterList.add(Musikverwaltung.allSongs.get(i).getInterpreter().toString());
 				interpreter = Musikverwaltung.allSongs.get(i).getInterpreter();
 			}
 		}
+        for(int i = 0; i<interpreterList.size(); i++) {
+        	if(interpreterList.get(i).isEmpty()) {
+        		interpreterList.remove(i);
+        	}
+        	interpreters.addItem(interpreterList.get(i));
+        }
         interpreters.addItemListener(new ItemListener() {
 			
 			@Override
@@ -230,11 +237,11 @@ public class MainFrame extends JFrame implements ActionListener {
 						list.setModel(listModel2);
 					}
 				}
-				if(interpreters.getSelectedItem().toString().equals("all interpreters")) {
+				if(interpreters.getSelectedItem().toString().equals("Interpreters")) {
 					list.setModel(listModel);
 				}
-				playlists.setSelectedItem("all songs");
-				genres.setSelectedItem("all genres");
+				playlists.setSelectedItem("Playlists");
+				genres.setSelectedItem("Genres");
 			}
 		});
         
@@ -260,11 +267,11 @@ public class MainFrame extends JFrame implements ActionListener {
 						list.setModel(listModel2);
 					}
 				}
-				if(genres.getSelectedItem().toString().equals("all genres")) {
+				if(genres.getSelectedItem().toString().equals("Genres")) {
 					list.setModel(listModel);
 				}
-				playlists.setSelectedItem("all songs");
-				interpreters.setSelectedItem("all interpreters");
+				playlists.setSelectedItem("Playlists");
+				interpreters.setSelectedItem("Interpreters");
 			}
 		});
         

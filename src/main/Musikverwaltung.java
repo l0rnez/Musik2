@@ -57,7 +57,6 @@ public class Musikverwaltung{
 				        }
 				        line = br.readLine();
 				    }
-				    String everything = sb.toString();
 				} finally {
 				    br.close();
 				}
